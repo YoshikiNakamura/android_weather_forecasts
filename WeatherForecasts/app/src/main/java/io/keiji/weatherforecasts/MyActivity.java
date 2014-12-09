@@ -2,6 +2,7 @@ package io.keiji.weatherforecasts;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -13,10 +14,14 @@ import java.io.IOException;
 public class MyActivity extends Activity {
 
     private TextView textView;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        handler = new Handler();
+
         setContentView(R.layout.activity_my);
 
         textView = (TextView) findViewById(R.id.tv_main);   //idがtv_mainのTextViewオブジェクトを作る。
@@ -34,10 +39,20 @@ public class MyActivity extends Activity {
             @Override
             public void run(){
                 try{
-                    String data = WeatherApi.getWeather(MyActivity.this, "400040");
-                    textView.setText(data);
-                }catch (IOException e){
-                    Toast.makeText(MyActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    final String data = WeatherApi.getWeather(MyActivity.this, "400040");
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            textView.setText(data);
+                        }
+                    });
+                }catch (final IOException e){
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MyActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         };
