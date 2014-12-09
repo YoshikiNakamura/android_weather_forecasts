@@ -21,12 +21,27 @@ public class MyActivity extends Activity {
 
         textView = (TextView) findViewById(R.id.tv_main);   //idがtv_mainのTextViewオブジェクトを作る。
 
+        /*メインスレッドからネットワーク通信できない（android.os.NetworkOnMainThreadExceptionが発生する）
         try {
             String data = WeatherApi.getWeather(this, "400040");    //WeatherApiを使って天気情報を取得して、
             textView.setText(data);                                 //結果をTextViewに表示する。
         } catch (IOException e) {
             Toast.makeText(this, "IOException is occurred", Toast.LENGTH_SHORT).show();
         }
+        */
+
+        Thread thread = new Thread(){
+            @Override
+            public void run(){
+                try{
+                    String data = WeatherApi.getWeather(MyActivity.this, "400040");
+                    textView.setText(data);
+                }catch (IOException e){
+                    Toast.makeText(MyActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+        thread.start();
     }
 
     @Override
