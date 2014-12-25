@@ -21,12 +21,18 @@ public class MyActivity extends ActionBarActivity {
 
         textView = (TextView) findViewById(R.id.tv_main);
 
-        try {
-            String data = WeatherApi.getWeather(this, "400040");
-            textView.setText(data);
-        } catch (IOException e) {
-            Toast.makeText(this, "IOException is occurred!", Toast.LENGTH_SHORT).show();
-        }
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    String data = WeatherApi.getWeather(MyActivity.this, "400040");
+                    textView.setText(data);
+                } catch (IOException e) {
+                    Toast.makeText(MyActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+        thread.start();
     }
 
 
