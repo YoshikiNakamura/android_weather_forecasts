@@ -1,19 +1,47 @@
 package io.keiji.weatherforecasts;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
-public class MyActivity extends ActionBarActivity {
+
+public class MyActivity extends Activity {
+
+    private TextView textView;
+
+    private class GetWeatherForecastTask extends GetWeatherForecastApiTask {
+
+        public GetWeatherForecastTask(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onPostExecute(String data) {
+            super.onPostExecute(data);
+
+            if(data != null) {
+                textView.setText(data);
+            } else if (exception != null) {
+                Toast.makeText(MyActivity.this, exception.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my);
-    }
 
+        setContentView(R.layout.activity_my);
+
+        textView = (TextView) findViewById(R.id.tv_main);   //idがtv_mainのTextViewオブジェクトを作る。
+
+        new GetWeatherForecastTask(this).execute("400040");
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
