@@ -1,5 +1,6 @@
 package io.keiji.weatherforecasts;
 
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,10 +14,14 @@ import java.io.IOException;
 public class MyActivity extends ActionBarActivity {
 
     private TextView textView;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        handler = new Handler();
+
         setContentView(R.layout.activity_my);
 
         textView = (TextView) findViewById(R.id.tv_main);
@@ -24,11 +29,22 @@ public class MyActivity extends ActionBarActivity {
         Thread thread = new Thread() {
             @Override
             public void run() {
+
                 try {
-                    String data = WeatherApi.getWeather(MyActivity.this, "400040");
-                    textView.setText(data);
-                } catch (IOException e) {
-                    Toast.makeText(MyActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    final String data = WeatherApi.getWeather(MyActivity.this, "400040");
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            textView.setText(data);
+                        }
+                    });
+                } catch (final IOException e) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MyActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         };
